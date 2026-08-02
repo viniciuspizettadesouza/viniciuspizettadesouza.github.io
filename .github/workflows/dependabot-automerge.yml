@@ -21,17 +21,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Read Dependabot update metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          pr-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+      - name: Read pull request metadata
+        id: pull_request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+        run: >-
+          gh pr view "$PR_NUMBER"
+          --repo "$GITHUB_REPOSITORY"
+          --json author,baseRefName,headRefName,state
+          --jq '"author=\(.author.login)\nbase_ref=\(.baseRefName)\nhead_ref=\(.headRefName)\nstate=\(.state)"'
+          >> "$GITHUB_OUTPUT"
 
       - name: Merge patch and minor updates
         if: >-
-          steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
-          steps.metadata.outputs.update-type == 'version-update:semver-minor'
+          (
+            steps.pull_request.outputs.author == 'app/dependabot' ||
+            steps.pull_request.outputs.author == 'dependabot[bot]'
+          ) &&
+          steps.pull_request.outputs.state == 'OPEN' &&
+          (
+            startsWith(steps.pull_request.outputs.head_ref, 'dependabot/npm_and_yarn/production-dependencies-') ||
+            startsWith(steps.pull_request.outputs.head_ref, 'dependabot/npm_and_yarn/development-dependencies-') ||
+            startsWith(steps.pull_request.outputs.head_ref, 'dependabot/npm_and_yarn/security-updates-') ||
+            startsWith(steps.pull_request.outputs.head_ref, 'dependabot/github_actions/github-actions-')
+          )
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
@@ -39,9 +53,18 @@ jobs:
 
       - name: Deploy the updated website
         if: >-
-          steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
-          steps.metadata.outputs.update-type == 'version-update:semver-minor'
+          (
+            steps.pull_request.outputs.author == 'app/dependabot' ||
+            steps.pull_request.outputs.author == 'dependabot[bot]'
+          ) &&
+          steps.pull_request.outputs.state == 'OPEN' &&
+          (
+            startsWith(steps.pull_request.outputs.head_ref, 'dependabot/npm_and_yarn/production-dependencies-') ||
+            startsWith(steps.pull_request.outputs.head_ref, 'dependabot/npm_and_yarn/development-dependencies-') ||
+            startsWith(steps.pull_request.outputs.head_ref, 'dependabot/npm_and_yarn/security-updates-') ||
+            startsWith(steps.pull_request.outputs.head_ref, 'dependabot/github_actions/github-actions-')
+          )
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET_BRANCH: ${{ github.event.workflow_run.pull_requests[0].base.ref }}
+          TARGET_BRANCH: ${{ steps.pull_request.outputs.base_ref }}
         run: gh workflow run deploy-pages.yml --repo "$GITHUB_REPOSITORY" --ref "$TARGET_BRANCH"

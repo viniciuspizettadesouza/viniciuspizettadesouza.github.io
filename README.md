@@ -1,54 +1,100 @@
-# React + TypeScript + Vite
+# Vinicius Souza Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Personal portfolio for [Vinicius Souza](https://viniciuspizettadesouza.github.io/), a Senior Full-Stack Engineer with a strong background in frontend architecture, React, and TypeScript.
 
-Currently, two official plugins are available:
+The site presents my professional experience, technical focus, and contact links in a focused single-page format.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Live website:** [viniciuspizettadesouza.github.io](https://viniciuspizettadesouza.github.io/)
 
-## Expanding the ESLint configuration
+[![Vinicius Souza portfolio preview](docs/portfolio-preview.png)](https://viniciuspizettadesouza.github.io/)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Technology
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+| Area | Tools |
+| --- | --- |
+| Interface | React 19, TypeScript 6, Tailwind CSS 4 |
+| Build | Vite 6, SWC |
+| Quality | ESLint 9, TypeScript strict mode |
+| Delivery | pnpm, GitHub Actions, GitHub Pages |
+| Maintenance | Dependabot |
+
+## Project structure
+
+```text
+.
+├── .github/
+│   ├── dependabot.yml
+│   └── workflows/
+│       ├── dependabot-automerge.yml
+│       ├── deploy-pages.yml
+│       └── pull-request-checks.yml
+├── docs/
+│   └── portfolio-preview.png
+├── public/
+│   ├── apple-touch-icon.png
+│   ├── monogram.png
+│   ├── og-image.png
+│   ├── robots.txt
+│   └── sitemap.xml
+├── src/
+│   ├── App.tsx
+│   ├── index.css
+│   └── main.tsx
+├── index.html
+├── package.json
+└── vite.config.ts
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Local development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Use Node.js 24 and pnpm 10.13.1, which match the deployment workflow.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+corepack enable
+pnpm install
+pnpm dev
 ```
+
+Vite will print the local development URL in the terminal.
+
+### Commands
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Start the Vite development server |
+| `pnpm lint` | Run ESLint across the project |
+| `pnpm build` | Type-check and create the production build |
+| `pnpm preview` | Preview the production build locally |
+
+## Design decisions
+
+- A single page keeps the portfolio focused and makes the most important information easy to scan.
+- The deep navy and restrained gold palette draws from the VS monogram and gives the site a distinct visual identity.
+- React and Vite provide a small, fast static build without introducing routing or server-side complexity that the content does not need.
+- Professional experience appears before the skills list so evidence and outcomes provide context for the technology choices.
+- Responsive layouts preserve the editorial structure across desktop and mobile screens.
+- Canonical metadata, Open Graph images, JSON-LD, robots.txt, and sitemap.xml support search engines and professional sharing previews.
+
+## Accessibility
+
+The interface includes:
+
+- Semantic landmarks and a consistent heading hierarchy.
+- Accessible labels for icon-only contact links.
+- Visible keyboard focus styles.
+- Decorative artwork hidden from assistive technology.
+- High-contrast text and controls against the navy background.
+- Responsive layouts that work from small mobile screens upward.
+- Reduced-motion handling for users who request it in their system settings.
+
+## Deployment
+
+The website is deployed to GitHub Pages through GitHub Actions.
+
+1. A push to `main` starts the `Deploy to GitHub Pages` workflow.
+2. The workflow installs the frozen pnpm lockfile using Node.js 24.
+3. ESLint and the production build must pass.
+4. The generated `dist` directory is uploaded as a Pages artifact.
+5. GitHub deploys the artifact to the `github-pages` environment.
+
+Pull requests run the same lint and build checks before merge. Dependabot checks npm packages and GitHub Actions weekly. Grouped patch and minor dependency updates can merge automatically after the pull request checks pass. Major updates remain open for manual review.
